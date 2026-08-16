@@ -5,7 +5,7 @@
 
 // ⚠️ গুরুত্বপূর্ণ: এখানে আপনার Google Apps Script Web App URL বসান।
 // README.md এ ধাপে ধাপে দেখানো আছে কীভাবে এই URL তৈরি করবেন।
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/আপনার_ডিপ্লয়মেন্ট_আইডি/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbymeSdRNJDBkwHGh5HYe5nTYiaic3cTnwszbCmVLwM_LbIxOCnNRXHn_jjcaTnR4Ns/exec";
 
 // হোয়াটসঅ্যাপ নম্বর (৮৮ কান্ট্রি কোডসহ, প্রথমে ০ ছাড়া)
 const WHATSAPP_NUMBER = "8801863709122";
