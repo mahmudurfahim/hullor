@@ -22,7 +22,8 @@ function doPost(e) {
       data.district || "",        // জেলা
       data.address || "",         // সম্পূর্ণ ঠিকানা
       data.note || "",            // অর্ডার নোট
-      data.products || "",        // প্রোডাক্ট তালিকা
+      data.productCodes || "",    // প্রোডাক্ট কোড (আলাদা কলাম, দ্রুত খোঁজার জন্য)
+      data.products || "",        // প্রোডাক্ট তালিকা (নাম, কোড, সাইজ, পরিমাণ, দাম বিস্তারিত)
       data.total || 0,            // সর্বমোট টাকা
       "ক্যাশ অন ডেলিভারি",         // পেমেন্ট পদ্ধতি
       "নতুন",                     // অর্ডার স্ট্যাটাস (ম্যানুয়ালি আপডেট করুন: নতুন / প্রসেসিং / ডেলিভারড / বাতিল)
@@ -59,14 +60,15 @@ function getOrCreateSheet() {
       "জেলা",
       "সম্পূর্ণ ঠিকানা",
       "অর্ডার নোট",
-      "পণ্য তালিকা",
+      "প্রোডাক্ট কোড",
+      "পণ্য তালিকা (বিস্তারিত)",
       "সর্বমোট (৳)",
       "পেমেন্ট",
       "স্ট্যাটাস",
     ]);
     sheet.setFrozenRows(1);
-    sheet.getRange(1, 1, 1, 11).setFontWeight("bold");
-    sheet.autoResizeColumns(1, 11);
+    sheet.getRange(1, 1, 1, 12).setFontWeight("bold");
+    sheet.autoResizeColumns(1, 12);
   }
   return sheet;
 }

@@ -200,6 +200,43 @@
   </div>
 </div>
 
+<!-- ============== PRODUCT DETAILS MODAL ============== -->
+<div class="modal" id="productModal" aria-label="প্রোডাক্ট বিস্তারিত">
+  <div class="pm-card">
+    <button class="modal-close" id="pmCloseBtn" aria-label="বন্ধ করুন">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="pm-media">
+      <span class="punch"></span>
+      <img id="pmImage" src="" alt="">
+      <span id="pmBadge" class="p-badge" style="display:none;"></span>
+    </div>
+
+    <div class="pm-info">
+      <span class="eyebrow" id="pmCat"></span>
+      <h3 id="pmName"></h3>
+      <span id="pmCode"></span>
+
+      <div class="pm-price-row">
+        <span id="pmPrice"></span>
+        <span id="pmOldPrice"></span>
+      </div>
+
+      <p id="pmDesc"></p>
+
+      <div class="pm-specs" id="pmSpecs"></div>
+
+      <span class="pm-size-label">সাইজ বেছে নিন</span>
+      <div id="pmSizes"></div>
+
+      <div class="pm-actions">
+        <button class="btn btn-gold btn-full" id="pmAddCartBtn">কার্টে যোগ করুন</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ============== TOAST ============== -->
 <div class="toast-wrap" id="toastWrap"></div>
 

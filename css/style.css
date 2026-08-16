@@ -96,11 +96,15 @@ ul { list-style: none; margin: 0; padding: 0; }
   position: sticky;
   top: 0;
   z-index: 60;
-  background: rgba(16, 18, 16, 0.92);
-  backdrop-filter: blur(10px);
+  background: rgba(14, 16, 14, 0.98);
   border-bottom: 1px solid var(--line);
   height: var(--nav-h);
 }
+/* নোট: এখানে ইচ্ছাকৃতভাবে backdrop-filter ব্যবহার করা হয়নি —
+   backdrop-filter/filter/transform কোনো ancestor-এ থাকলে সেটি তার
+   position:fixed চাইল্ড (যেমন মোবাইল মেনু .nav-links)-এর জন্য নতুন
+   containing block তৈরি করে, ফলে মোবাইলে মেনু ভুল জায়গায় (হেডারের
+   উপরে আটকে) দেখায়। তাই সলিড ব্যাকগ্রাউন্ড ব্যবহার করা হয়েছে। */
 .nav .container {
   height: 100%;
   display: flex;
@@ -442,23 +446,38 @@ ul { list-style: none; margin: 0; padding: 0; }
   border-top: 1px dashed var(--line);
   margin: 2px 0;
 }
+.p-btn-row { display: flex; gap: 8px; }
+.btn-view-details {
+  flex: 1;
+  padding: 10px 10px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 4px;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-view-details:hover { border-color: var(--gold); color: var(--cream); }
 .add-cart-btn {
-  width: 100%;
-  padding: 10px 14px;
+  flex: 1.4;
+  padding: 10px 10px;
   background: transparent;
   border: 1px solid var(--gold-dim);
   color: var(--gold-light);
   border-radius: 4px;
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 .add-cart-btn:hover { background: var(--gold); border-color: var(--gold); color: #191b16; }
-.add-cart-btn svg { width: 15px; height: 15px; }
+.add-cart-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
 
 /* =========================================================
    ABOUT US
@@ -691,6 +710,66 @@ ul { list-style: none; margin: 0; padding: 0; }
 .success-view h3 { margin-bottom: 8px; }
 .success-view p { color: var(--muted); margin-bottom: 6px; }
 .success-view .order-id { font-family: var(--font-mono); color: var(--gold-light); font-size: 15px; margin-bottom: 24px; display: inline-block; border: 1px dashed var(--gold-dim); padding: 8px 16px; border-radius: 5px; }
+
+/* =========================================================
+   PRODUCT DETAILS (QUICK VIEW) MODAL
+   ========================================================= */
+.pm-card {
+  width: 100%;
+  max-width: 760px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 26px;
+  position: relative;
+  transform: translateY(14px);
+  transition: transform 0.3s ease;
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 28px;
+}
+.modal.open .pm-card { transform: translateY(0); }
+.pm-media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--gold-dim);
+  background: var(--green-deep);
+}
+.pm-media img { width: 100%; height: 100%; object-fit: cover; }
+.pm-media .punch { top: 14px; left: 14px; z-index: 2; }
+#pmBadge {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: var(--gold);
+  color: #191b16;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 3px;
+}
+.pm-info { display: flex; flex-direction: column; }
+#pmCat { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--gold-dim); text-transform: uppercase; }
+#pmName { font-family: var(--font-display); font-size: 24px; color: var(--cream); margin: 8px 0 4px; line-height: 1.3; }
+#pmCode { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.pm-price-row { display: flex; align-items: baseline; gap: 10px; margin: 12px 0 14px; }
+#pmPrice { font-family: var(--font-display); font-size: 26px; color: var(--gold-light); }
+#pmOldPrice { font-size: 14px; color: var(--muted); text-decoration: line-through; }
+#pmDesc { font-size: 14.5px; color: var(--muted); line-height: 1.7; margin: 0 0 16px; }
+
+.pm-specs { border: 1px dashed var(--line); border-radius: 6px; padding: 4px 14px; margin-bottom: 18px; }
+.pm-spec-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 9px 0; border-bottom: 1px dashed var(--line); color: var(--muted); }
+.pm-spec-row:last-child { border-bottom: none; }
+.pm-spec-row b { color: var(--cream); text-align: right; font-weight: 500; }
+
+.pm-size-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; display: block; }
+#pmSizes { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.pm-actions { margin-top: auto; }
+
+@media (max-width: 720px) {
+  .pm-card { grid-template-columns: 1fr; padding: 20px; max-height: 88vh; overflow-y: auto; }
+}
 
 /* =========================================================
    TOAST

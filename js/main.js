@@ -132,13 +132,13 @@ function productCardHTML(p) {
   return `
     <div class="p-card" data-id="${p.id}">
       <span class="punch"></span>
-      <div class="p-media">
+      <div class="p-media" data-role="view" style="cursor:pointer;">
         <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='/images/logo.jpg'">
         ${discount ? `<span class="p-badge">${bnDigits(discount)}% ছাড়</span>` : ""}
       </div>
       <div class="p-body">
         <span class="p-cat">${catName}</span>
-        <h3 class="p-name">${p.name}</h3>
+        <h3 class="p-name" data-role="view" style="cursor:pointer;">${p.name}</h3>
         <span class="p-code">কোড: ${p.code}</span>
         <div class="p-price-row">
           <span class="p-price">${bdt(p.price)}</span>
@@ -153,10 +153,13 @@ function productCardHTML(p) {
             .join("")}
         </div>
         <div class="p-dashline"></div>
-        <button class="add-cart-btn" data-role="add">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          কার্টে যোগ করুন
-        </button>
+        <div class="p-btn-row">
+          <button class="btn-view-details" data-role="view">বিস্তারিত দেখুন</button>
+          <button class="add-cart-btn" data-role="add">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            কার্টে যোগ করুন
+          </button>
+        </div>
       </div>
     </div>`;
 }
@@ -171,6 +174,69 @@ function wireProductCard(card) {
     });
   });
   $('[data-role="add"]', card).addEventListener("click", () => addToCart(id));
+  $$('[data-role="view"]', card).forEach((el) => el.addEventListener("click", () => openProductModal(id)));
+}
+
+/* =========================================================
+   প্রোডাক্ট ডিটেইলস (কুইক-ভিউ) মোডাল — প্রতিটি পণ্যের নিজস্ব বিস্তারিত তথ্য
+   ========================================================= */
+let activeModalProductId = null;
+
+function openProductModal(productId) {
+  const modal = $("#productModal");
+  if (!modal) return;
+  const p = PRODUCTS.find((x) => x.id === productId);
+  if (!p) return;
+
+  activeModalProductId = productId;
+  const catName = CATEGORIES.find((c) => c.id === p.category)?.name || "";
+  const discount = p.oldPrice ? Math.round(100 - (p.price / p.oldPrice) * 100) : null;
+  const selectedSize = selectedSizeByProduct[p.id];
+
+  $("#pmImage").src = p.image;
+  $("#pmImage").alt = p.name;
+  $("#pmCat").textContent = catName;
+  $("#pmName").textContent = p.name;
+  $("#pmCode").textContent = "কোড: " + p.code;
+  $("#pmPrice").textContent = bdt(p.price);
+  $("#pmOldPrice").textContent = p.oldPrice ? bdt(p.oldPrice) : "";
+  $("#pmOldPrice").style.display = p.oldPrice ? "inline" : "none";
+  $("#pmBadge").textContent = discount ? `${bnDigits(discount)}% ছাড়` : "";
+  $("#pmBadge").style.display = discount ? "inline-flex" : "none";
+  $("#pmDesc").textContent = p.desc || "";
+
+  $("#pmSpecs").innerHTML = `
+    ${p.fabric ? `<div class="pm-spec-row"><span>ফেব্রিক</span><b>${p.fabric}</b></div>` : ""}
+    ${p.fit ? `<div class="pm-spec-row"><span>ফিট</span><b>${p.fit}</b></div>` : ""}
+    ${p.care ? `<div class="pm-spec-row"><span>কেয়ার নির্দেশনা</span><b>${p.care}</b></div>` : ""}
+    <div class="pm-spec-row"><span>ডেলিভারি</span><b>ফ্রি (সারা বাংলাদেশ)</b></div>
+    <div class="pm-spec-row"><span>পেমেন্ট</span><b>ক্যাশ অন ডেলিভারি</b></div>
+  `;
+
+  $("#pmSizes").innerHTML = p.sizes
+    .map((s) => `<button type="button" class="size-chip ${selectedSize === s ? "selected" : ""}" data-size="${s}">${s}</button>`)
+    .join("");
+  $$(".size-chip", $("#pmSizes")).forEach((chip) => {
+    chip.addEventListener("click", () => {
+      selectedSizeByProduct[p.id] = chip.dataset.size;
+      $$(".size-chip", $("#pmSizes")).forEach((c) => c.classList.remove("selected"));
+      chip.classList.add("selected");
+      // কার্ডেও সিলেকশন সিঙ্ক করুন
+      const card = document.querySelector(`.p-card[data-id="${p.id}"]`);
+      if (card) {
+        $$(".size-chip", card).forEach((c) => c.classList.toggle("selected", c.dataset.size === chip.dataset.size));
+      }
+    });
+  });
+
+  modal.classList.add("open");
+  $("#overlay")?.classList.add("open");
+  $("#cartDrawer")?.classList.remove("open");
+}
+
+function closeProductModal() {
+  $("#productModal")?.classList.remove("open");
+  $("#overlay")?.classList.remove("open");
 }
 
 /* =========================================================
@@ -319,6 +385,7 @@ function renderCart() {
    ড্রয়ার / মোডাল টগল
    ========================================================= */
 function openCart() {
+  closeProductModal();
   $("#overlay")?.classList.add("open");
   $("#cartDrawer")?.classList.add("open");
 }
@@ -332,6 +399,7 @@ function openCheckout() {
     showToast("চেকআউট করার আগে কার্টে পণ্য যোগ করুন", true);
     return;
   }
+  closeProductModal();
   renderOrderSummary();
   $("#checkoutModal")?.classList.add("open");
   $("#overlay")?.classList.add("open");
@@ -403,8 +471,9 @@ async function submitOrder(e) {
 
   const orderId = generateOrderId();
   const productsStr = cart.map((i) => `${i.name} (${i.code}) | সাইজ:${i.size} | পরিমাণ:${i.qty} | ${i.price * i.qty}৳`).join("  ||  ");
+  const productCodesStr = cart.map((i) => `${i.code} (x${i.qty})`).join(", ");
 
-  const payload = { orderId, name, phone, district, address, note, products: productsStr, total: cartTotal() };
+  const payload = { orderId, name, phone, district, address, note, products: productsStr, productCodes: productCodesStr, total: cartTotal() };
 
   const submitBtn = $("#submitOrderBtn");
   submitBtn.disabled = true;
@@ -480,10 +549,18 @@ function init() {
   $("#overlay")?.addEventListener("click", () => {
     closeCart();
     closeCheckout();
+    closeProductModal();
   });
 
   $("#modalCloseBtn")?.addEventListener("click", closeCheckout);
   $("#checkoutForm")?.addEventListener("submit", submitOrder);
+
+  $("#pmCloseBtn")?.addEventListener("click", closeProductModal);
+  $("#pmAddCartBtn")?.addEventListener("click", () => {
+    if (!activeModalProductId) return;
+    addToCart(activeModalProductId);
+    closeProductModal();
+  });
 
   $("#menuToggle")?.addEventListener("click", () => {
     $("#navLinks").classList.toggle("open");
