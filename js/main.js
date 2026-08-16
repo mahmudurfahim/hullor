@@ -1,0 +1,505 @@
+/* =========================================================
+   HULLOR — main.js
+   পণ্য রেন্ডার, কার্ট সিস্টেম, চেকআউট ও হিরো স্লাইডার
+   ========================================================= */
+
+// ⚠️ গুরুত্বপূর্ণ: এখানে আপনার Google Apps Script Web App URL বসান।
+// README.md এ ধাপে ধাপে দেখানো আছে কীভাবে এই URL তৈরি করবেন।
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/আপনার_ডিপ্লয়মেন্ট_আইডি/exec";
+
+// হোয়াটসঅ্যাপ নম্বর (৮৮ কান্ট্রি কোডসহ, প্রথমে ০ ছাড়া)
+const WHATSAPP_NUMBER = "8801863709122";
+const STORE_PHONE_DISPLAY = "০১৮৬৩৭-০৯১২২";
+
+// ------- state -------
+let cart = loadCart();
+let activeCategory = "all";
+let selectedSizeByProduct = {};
+
+// ------- helpers -------
+const bdt = (n) => "৳" + n.toLocaleString("bn-BD");
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+function bnDigits(n) {
+  const map = { 0: "০", 1: "১", 2: "২", 3: "৩", 4: "৪", 5: "৫", 6: "৬", 7: "৭", 8: "৮", 9: "৯" };
+  return String(n).replace(/[0-9]/g, (d) => map[d]);
+}
+
+function waLink(text) {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+}
+
+/* =========================================================
+   কার্ট পার্সিস্ট (localStorage) — পেজ পরিবর্তন করলেও কার্ট থেকে যাবে
+   ========================================================= */
+function loadCart() {
+  try {
+    const raw = localStorage.getItem("hullor_cart");
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+function saveCart() {
+  try {
+    localStorage.setItem("hullor_cart", JSON.stringify(cart));
+  } catch (e) {
+    /* localStorage অনুপলব্ধ হলেও সাইট চলবে, শুধু কার্ট পেজ পরিবর্তনে ধরে রাখবে না */
+  }
+}
+
+/* =========================================================
+   হিরো ইমেজ স্লাইডার (৩টি ছবি)
+   ========================================================= */
+const HERO_SLIDES = [
+  { image: "/images/punjabi1-demo.jpg", title: "নতুন পাঞ্জাবি কালেকশন" },
+  { image: "/images/shirt1-demo.jpg", title: "সিগনেচার শার্ট সিরিজ" },
+  { image: "/images/dropshoulder1-demo.jpg", title: "ট্রেন্ডি ড্রপ শোল্ডার" },
+];
+let heroSlideIndex = 0;
+let heroSlideTimer = null;
+
+function initHeroSlider() {
+  const wrap = $("#heroSlider");
+  if (!wrap) return;
+
+  const track = $("#heroSlideTrack");
+  const dotsWrap = $("#heroSlideDots");
+  const titleEl = $("#heroSlideTitle");
+
+  track.innerHTML = HERO_SLIDES.map(
+    (s, i) => `<div class="hero-slide" data-i="${i}"><img src="${s.image}" alt="${s.title}" onerror="this.src='/images/logo.jpg'"></div>`
+  ).join("");
+
+  dotsWrap.innerHTML = HERO_SLIDES.map(
+    (_, i) => `<button class="hero-dot ${i === 0 ? "active" : ""}" data-i="${i}" aria-label="স্লাইড ${bnDigits(i + 1)}"></button>`
+  ).join("");
+
+  titleEl.textContent = HERO_SLIDES[0].title;
+
+  $$(".hero-dot", dotsWrap).forEach((dot) => {
+    dot.addEventListener("click", () => goToHeroSlide(Number(dot.dataset.i)));
+  });
+
+  startHeroAutoplay();
+}
+
+function goToHeroSlide(i) {
+  heroSlideIndex = i;
+  const track = $("#heroSlideTrack");
+  track.style.transform = `translateX(-${i * 100}%)`;
+  $$(".hero-dot").forEach((d) => d.classList.toggle("active", Number(d.dataset.i) === i));
+  $("#heroSlideTitle").textContent = HERO_SLIDES[i].title;
+  restartHeroAutoplay();
+}
+
+function startHeroAutoplay() {
+  heroSlideTimer = setInterval(() => {
+    goToHeroSlide((heroSlideIndex + 1) % HERO_SLIDES.length);
+  }, 4200);
+}
+function restartHeroAutoplay() {
+  clearInterval(heroSlideTimer);
+  startHeroAutoplay();
+}
+
+/* =========================================================
+   ক্যাটাগরি ট্যাব রেন্ডার (শুধু শপ পেজে)
+   ========================================================= */
+function renderCategoryTabs() {
+  const wrap = $("#catTabs");
+  if (!wrap) return;
+  wrap.innerHTML = CATEGORIES.map(
+    (c) => `<button class="cat-tab ${c.id === activeCategory ? "active" : ""}" data-cat="${c.id}">${c.name}</button>`
+  ).join("");
+  $$(".cat-tab", wrap).forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeCategory = btn.dataset.cat;
+      renderCategoryTabs();
+      renderProducts();
+    });
+  });
+}
+
+/* =========================================================
+   প্রোডাক্ট কার্ড HTML
+   ========================================================= */
+function productCardHTML(p) {
+  const catName = CATEGORIES.find((c) => c.id === p.category)?.name || "";
+  const selectedSize = selectedSizeByProduct[p.id];
+  const discount = p.oldPrice ? Math.round(100 - (p.price / p.oldPrice) * 100) : null;
+  return `
+    <div class="p-card" data-id="${p.id}">
+      <span class="punch"></span>
+      <div class="p-media">
+        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='/images/logo.jpg'">
+        ${discount ? `<span class="p-badge">${bnDigits(discount)}% ছাড়</span>` : ""}
+      </div>
+      <div class="p-body">
+        <span class="p-cat">${catName}</span>
+        <h3 class="p-name">${p.name}</h3>
+        <span class="p-code">কোড: ${p.code}</span>
+        <div class="p-price-row">
+          <span class="p-price">${bdt(p.price)}</span>
+          ${p.oldPrice ? `<span class="p-price-old">${bdt(p.oldPrice)}</span>` : ""}
+        </div>
+        <div class="p-sizes" data-role="sizes">
+          ${p.sizes
+            .map(
+              (s) =>
+                `<button type="button" class="size-chip ${selectedSize === s ? "selected" : ""}" data-size="${s}">${s}</button>`
+            )
+            .join("")}
+        </div>
+        <div class="p-dashline"></div>
+        <button class="add-cart-btn" data-role="add">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          কার্টে যোগ করুন
+        </button>
+      </div>
+    </div>`;
+}
+
+function wireProductCard(card) {
+  const id = card.dataset.id;
+  $$(".size-chip", card).forEach((chip) => {
+    chip.addEventListener("click", () => {
+      selectedSizeByProduct[id] = chip.dataset.size;
+      $$(".size-chip", card).forEach((c) => c.classList.remove("selected"));
+      chip.classList.add("selected");
+    });
+  });
+  $('[data-role="add"]', card).addEventListener("click", () => addToCart(id));
+}
+
+/* =========================================================
+   শপ পেজ — সম্পূর্ণ গ্রিড (ক্যাটাগরি ফিল্টারসহ)
+   ========================================================= */
+function renderProducts() {
+  const grid = $("#productGrid");
+  if (!grid) return;
+  const list = activeCategory === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.category === activeCategory);
+  grid.innerHTML = list.map(productCardHTML).join("");
+  $$(".p-card", grid).forEach(wireProductCard);
+}
+
+/* =========================================================
+   হোম পেজ — ফিচার্ড প্রোডাক্ট
+   ========================================================= */
+function renderFeaturedProducts() {
+  const grid = $("#featuredGrid");
+  if (!grid) return;
+  const list = PRODUCTS.filter((p) => p.featured);
+  grid.innerHTML = list.map(productCardHTML).join("");
+  $$(".p-card", grid).forEach(wireProductCard);
+}
+
+/* =========================================================
+   কার্ট লজিক
+   ========================================================= */
+function addToCart(productId) {
+  const product = PRODUCTS.find((p) => p.id === productId);
+  const size = selectedSizeByProduct[productId];
+
+  if (!size) {
+    showToast("দয়া করে প্রথমে একটি সাইজ বেছে নিন", true);
+    return;
+  }
+
+  const existing = cart.find((i) => i.id === productId && i.size === size);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({
+      id: product.id,
+      code: product.code,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      size,
+      qty: 1,
+    });
+  }
+  saveCart();
+  renderCart();
+  updateCartCount();
+  showToast(`"${product.name}" (সাইজ: ${size}) কার্টে যোগ হয়েছে`);
+  openCart();
+}
+
+function changeQty(index, delta) {
+  cart[index].qty += delta;
+  if (cart[index].qty <= 0) cart.splice(index, 1);
+  saveCart();
+  renderCart();
+  updateCartCount();
+}
+
+function removeItem(index) {
+  cart.splice(index, 1);
+  saveCart();
+  renderCart();
+  updateCartCount();
+}
+
+function cartTotal() {
+  return cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+}
+function cartCount() {
+  return cart.reduce((sum, i) => sum + i.qty, 0);
+}
+
+function updateCartCount() {
+  const el = $("#cartCount");
+  if (!el) return;
+  el.textContent = bnDigits(cartCount());
+  el.style.display = cartCount() > 0 ? "flex" : "none";
+}
+
+function renderCart() {
+  const body = $("#drawerBody");
+  const foot = $("#drawerFoot");
+  if (!body || !foot) return;
+
+  if (cart.length === 0) {
+    body.innerHTML = `
+      <div class="cart-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <p>আপনার কার্ট এখনো খালি</p>
+      </div>`;
+    foot.innerHTML = "";
+    return;
+  }
+
+  body.innerHTML = cart
+    .map(
+      (item, idx) => `
+    <div class="cart-item">
+      <img src="${item.image}" alt="${item.name}" onerror="this.src='/images/logo.jpg'">
+      <div>
+        <p class="cart-item-name">${item.name}</p>
+        <p class="cart-item-meta">সাইজ: ${item.size} • কোড: ${item.code}</p>
+        <div class="qty-stepper">
+          <button data-act="dec" data-idx="${idx}">−</button>
+          <span>${bnDigits(item.qty)}</span>
+          <button data-act="inc" data-idx="${idx}">+</button>
+        </div>
+      </div>
+      <div class="cart-item-right">
+        <span class="cart-item-price">${bdt(item.price * item.qty)}</span>
+        <button class="remove-btn" data-act="remove" data-idx="${idx}">সরান</button>
+      </div>
+    </div>`
+    )
+    .join("");
+
+  $$("[data-act]", body).forEach((btn) => {
+    const idx = Number(btn.dataset.idx);
+    btn.addEventListener("click", () => {
+      if (btn.dataset.act === "inc") changeQty(idx, 1);
+      if (btn.dataset.act === "dec") changeQty(idx, -1);
+      if (btn.dataset.act === "remove") removeItem(idx);
+    });
+  });
+
+  foot.innerHTML = `
+    <div class="summary-row"><span>সাবটোটাল</span><b>${bdt(cartTotal())}</b></div>
+    <div class="summary-row"><span>ডেলিভারি চার্জ</span><b>ফ্রি (সারা বাংলাদেশ)</b></div>
+    <div class="summary-total"><span>সর্বমোট</span><span>${bdt(cartTotal())}</span></div>
+    <button class="btn btn-gold btn-full" id="checkoutBtn">চেকআউট করুন</button>
+  `;
+  $("#checkoutBtn").addEventListener("click", () => {
+    closeCart();
+    openCheckout();
+  });
+}
+
+/* =========================================================
+   ড্রয়ার / মোডাল টগল
+   ========================================================= */
+function openCart() {
+  $("#overlay")?.classList.add("open");
+  $("#cartDrawer")?.classList.add("open");
+}
+function closeCart() {
+  $("#overlay")?.classList.remove("open");
+  $("#cartDrawer")?.classList.remove("open");
+}
+
+function openCheckout() {
+  if (cart.length === 0) {
+    showToast("চেকআউট করার আগে কার্টে পণ্য যোগ করুন", true);
+    return;
+  }
+  renderOrderSummary();
+  $("#checkoutModal")?.classList.add("open");
+  $("#overlay")?.classList.add("open");
+}
+function closeCheckout() {
+  $("#checkoutModal")?.classList.remove("open");
+  $("#overlay")?.classList.remove("open");
+}
+
+function renderOrderSummary() {
+  const box = $("#orderSummaryBox");
+  if (!box) return;
+  box.innerHTML =
+    cart
+      .map(
+        (i) =>
+          `<div class="summary-row"><span>${i.name} (${i.size}) × ${bnDigits(i.qty)}</span><b>${bdt(i.price * i.qty)}</b></div>`
+      )
+      .join("") +
+    `<div class="summary-row"><span>ডেলিভারি চার্জ</span><b>ফ্রি</b></div>
+     <div class="summary-total"><span>সর্বমোট</span><span>${bdt(cartTotal())}</span></div>`;
+}
+
+/* =========================================================
+   টোস্ট
+   ========================================================= */
+function showToast(msg, isWarning = false) {
+  const wrap = $("#toastWrap");
+  if (!wrap) return;
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.style.borderColor = isWarning ? "var(--danger)" : "var(--gold)";
+  el.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+/* =========================================================
+   চেকআউট ফর্ম সাবমিট
+   ========================================================= */
+function validatePhone(phone) {
+  const cleaned = phone.replace(/[\s-]/g, "");
+  return /^01[3-9]\d{8}$/.test(cleaned);
+}
+
+function generateOrderId() {
+  const d = new Date();
+  const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `HL-${stamp}-${rand}`;
+}
+
+async function submitOrder(e) {
+  e.preventDefault();
+
+  const name = $("#custName").value.trim();
+  const phone = $("#custPhone").value.trim();
+  const district = $("#custDistrict").value.trim();
+  const address = $("#custAddress").value.trim();
+  const note = $("#custNote").value.trim();
+
+  let valid = true;
+  if (!name) { $("#errName").textContent = "নাম আবশ্যক"; valid = false; } else { $("#errName").textContent = ""; }
+  if (!validatePhone(phone)) { $("#errPhone").textContent = "সঠিক মোবাইল নম্বর দিন (উদাহরণ: 01XXXXXXXXX)"; valid = false; } else { $("#errPhone").textContent = ""; }
+  if (!district) { $("#errDistrict").textContent = "জেলার নাম আবশ্যক"; valid = false; } else { $("#errDistrict").textContent = ""; }
+  if (!address) { $("#errAddress").textContent = "সম্পূর্ণ ঠিকানা আবশ্যক"; valid = false; } else { $("#errAddress").textContent = ""; }
+
+  if (!valid) return;
+
+  const orderId = generateOrderId();
+  const productsStr = cart.map((i) => `${i.name} (${i.code}) | সাইজ:${i.size} | পরিমাণ:${i.qty} | ${i.price * i.qty}৳`).join("  ||  ");
+
+  const payload = { orderId, name, phone, district, address, note, products: productsStr, total: cartTotal() };
+
+  const submitBtn = $("#submitOrderBtn");
+  submitBtn.disabled = true;
+  submitBtn.textContent = "অর্ডার পাঠানো হচ্ছে...";
+
+  try {
+    if (!APPS_SCRIPT_URL.includes("আপনার_ডিপ্লয়মেন্ট_আইডি")) {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+      });
+    } else {
+      console.warn("APPS_SCRIPT_URL সেট করা হয়নি — js/main.js ফাইলে URL বসান। README.md দেখুন।");
+    }
+
+    showSuccess(orderId, payload);
+    cart = [];
+    saveCart();
+    renderCart();
+    updateCartCount();
+    $("#checkoutForm").reset();
+  } catch (err) {
+    console.error(err);
+    showToast("অর্ডার পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন", true);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "অর্ডার কনফার্ম করুন";
+  }
+}
+
+function showSuccess(orderId, payload) {
+  $("#checkoutFormView").style.display = "none";
+  $("#successView").style.display = "block";
+  $("#successOrderId").textContent = orderId;
+
+  const waText =
+    `HULLOR — নতুন অর্ডার\n` +
+    `অর্ডার আইডি: ${orderId}\n` +
+    `নাম: ${payload.name}\n` +
+    `মোবাইল: ${payload.phone}\n` +
+    `ঠিকানা: ${payload.address}, ${payload.district}\n` +
+    `পণ্য: ${payload.products}\n` +
+    `সর্বমোট: ${payload.total}৳ (ক্যাশ অন ডেলিভারি)`;
+
+  const waBtn = $("#successWhatsappBtn");
+  if (waBtn) waBtn.href = waLink(waText);
+}
+
+/* =========================================================
+   ইনিট
+   ========================================================= */
+function init() {
+  // whatsapp লিংক বসানো (যেখানেই data-wa-order আছে)
+  $$("[data-wa-order]").forEach((a) => {
+    a.href = waLink("আসসালামু আলাইকুম, আমি HULLOR থেকে একটি অর্ডার করতে চাই।");
+  });
+  const topbarPhone = $("#topbarPhone");
+  if (topbarPhone) topbarPhone.textContent = STORE_PHONE_DISPLAY;
+  const topbarPhone2 = $("#topbarPhone2");
+  if (topbarPhone2) topbarPhone2.textContent = STORE_PHONE_DISPLAY;
+
+  initHeroSlider();
+  renderCategoryTabs();
+  renderProducts();
+  renderFeaturedProducts();
+  renderCart();
+  updateCartCount();
+
+  $("#cartIconBtn")?.addEventListener("click", openCart);
+  $("#drawerCloseBtn")?.addEventListener("click", closeCart);
+  $("#overlay")?.addEventListener("click", () => {
+    closeCart();
+    closeCheckout();
+  });
+
+  $("#modalCloseBtn")?.addEventListener("click", closeCheckout);
+  $("#checkoutForm")?.addEventListener("submit", submitOrder);
+
+  $("#menuToggle")?.addEventListener("click", () => {
+    $("#navLinks").classList.toggle("open");
+  });
+  $$("#navLinks a").forEach((a) =>
+    a.addEventListener("click", () => $("#navLinks")?.classList.remove("open"))
+  );
+
+  $("#successCloseBtn")?.addEventListener("click", () => {
+    closeCheckout();
+    $("#checkoutFormView").style.display = "block";
+    $("#successView").style.display = "none";
+  });
+
+  const yearEl = $("#year");
+  if (yearEl) yearEl.textContent = bnDigits(new Date().getFullYear());
+}
+
+document.addEventListener("DOMContentLoaded", init);
