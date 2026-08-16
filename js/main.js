@@ -270,7 +270,7 @@ function addToCart(productId) {
 
   if (!size) {
     showToast("দয়া করে প্রথমে একটি সাইজ বেছে নিন", true);
-    return;
+    return false;
   }
 
   const existing = cart.find((i) => i.id === productId && i.size === size);
@@ -292,6 +292,7 @@ function addToCart(productId) {
   updateCartCount();
   showToast(`"${product.name}" (সাইজ: ${size}) কার্টে যোগ হয়েছে`);
   openCart();
+  return true;
 }
 
 function changeQty(index, delta) {
@@ -558,8 +559,10 @@ function init() {
   $("#pmCloseBtn")?.addEventListener("click", closeProductModal);
   $("#pmAddCartBtn")?.addEventListener("click", () => {
     if (!activeModalProductId) return;
+    // addToCart() নিজেই সফল হলে openCart() কল করে, যা প্রোডাক্ট মোডাল বন্ধ করে দেয়।
+    // সাইজ বাছাই না করলে addToCart() false রিটার্ন করে এবং মোডাল খোলাই থাকে —
+    // যাতে ইউজার এরর দেখে সাইজ বেছে আবার চেষ্টা করতে পারে।
     addToCart(activeModalProductId);
-    closeProductModal();
   });
 
   $("#menuToggle")?.addEventListener("click", () => {
