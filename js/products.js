@@ -9,11 +9,11 @@
 const CATEGORIES = [
   { id: "all", name: "সকল পণ্য" },
   { id: "shirt", name: "শার্ট" },
+  { id: "punjabi", name: "পাঞ্জাবি" },
   { id: "polo", name: "পোলো টি-শার্ট" },
   { id: "dropshoulder", name: "ড্রপ শোল্ডার" },
   { id: "pants", name: "প্যান্ট" },
   { id: "combo", name: "কম্বো অফার" },
-  { id: "punjabi", name: "পাঞ্জাবি" },
   { id: "jersey", name: "জার্সি" },
 ];
 
