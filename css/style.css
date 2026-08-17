@@ -235,12 +235,14 @@ ul { list-style: none; margin: 0; padding: 0; }
   font-size: 15px;
   font-weight: 600;
   border: 1px solid transparent;
+  background: transparent;
+  font-family: inherit;
   transition: transform 0.15s ease, background 0.2s, border-color 0.2s, color 0.2s;
 }
 .btn:active { transform: translateY(1px); }
 .btn-gold { background: var(--gold); color: #191b16; }
 .btn-gold:hover { background: var(--gold-light); }
-.btn-outline { border-color: var(--gold-dim); color: var(--cream); }
+.btn-outline { background: transparent; border-color: var(--gold-dim); color: var(--cream); }
 .btn-outline:hover { border-color: var(--gold); color: var(--gold-light); }
 .btn-full { width: 100%; }
 .btn-block { display: flex; width: 100%; }
@@ -774,7 +776,19 @@ ul { list-style: none; margin: 0; padding: 0; }
 /* =========================================================
    TOAST
    ========================================================= */
-.toast-wrap { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 110; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.toast-wrap {
+  position: fixed;
+  top: calc(var(--nav-h) + 46px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 120;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  align-items: center;
+  width: min(92vw, 420px);
+}
+.toast { width: 100%; }
 .toast {
   background: var(--panel);
   border: 1px solid var(--gold);

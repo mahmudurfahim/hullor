@@ -453,7 +453,7 @@ function generateOrderId() {
   return `HL-${stamp}-${rand}`;
 }
 
-async function submitOrder(e) {
+function submitOrder(e) {
   e.preventDefault();
 
   const name = $("#custName").value.trim();
@@ -480,31 +480,27 @@ async function submitOrder(e) {
   submitBtn.disabled = true;
   submitBtn.textContent = "অর্ডার পাঠানো হচ্ছে...";
 
-  try {
-    if (!APPS_SCRIPT_URL.includes("আপনার_ডিপ্লয়মেন্ট_আইডি")) {
-      await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload),
-      });
-    } else {
-      console.warn("APPS_SCRIPT_URL সেট করা হয়নি — js/main.js ফাইলে URL বসান। README.md দেখুন।");
-    }
-
-    showSuccess(orderId, payload);
-    cart = [];
-    saveCart();
-    renderCart();
-    updateCartCount();
-    $("#checkoutForm").reset();
-  } catch (err) {
-    console.error(err);
-    showToast("অর্ডার পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন", true);
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "অর্ডার কনফার্ম করুন";
+  // no-cors মোডে রেসপন্স পড়া যায় না (opaque), তাই fetch শেষ হওয়ার জন্য অপেক্ষা না করে
+  // ব্যাকগ্রাউন্ডে পাঠিয়ে সাথে সাথেই সাকসেস দেখানো হচ্ছে — এতে অর্ডার কনফার্মেশন অনেক দ্রুত হয়।
+  if (!APPS_SCRIPT_URL.includes("আপনার_ডিপ্লয়মেন্ট_আইডি")) {
+    fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+    }).catch((err) => console.error("Order sync failed:", err));
+  } else {
+    console.warn("APPS_SCRIPT_URL সেট করা হয়নি — js/main.js ফাইলে URL বসান। README.md দেখুন।");
   }
+
+  showSuccess(orderId, payload);
+  cart = [];
+  saveCart();
+  renderCart();
+  updateCartCount();
+  $("#checkoutForm").reset();
+  submitBtn.disabled = false;
+  submitBtn.textContent = "অর্ডার কনফার্ম করুন";
 }
 
 function showSuccess(orderId, payload) {
