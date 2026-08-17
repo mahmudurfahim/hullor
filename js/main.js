@@ -30,6 +30,14 @@ function waLink(text) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
+// প্রতিটি হোয়াটসঅ্যাপ বাটনের নিজস্ব উদ্দেশ্য অনুযায়ী আলাদা বার্তা
+const WA_MESSAGES = {
+  order: "আসসালামু আলাইকুম, আমি HULLOR থেকে একটি অর্ডার করতে চাই।",
+  track: "আসসালামু আলাইকুম, আমি আমার HULLOR অর্ডারটি ট্র্যাক করতে চাই।\nঅর্ডার আইডি / মোবাইল নম্বর: ",
+  return: "আসসালামু আলাইকুম, আমি একটি HULLOR পণ্য রিটার্ন/এক্সচেঞ্জ করতে চাই।\nঅর্ডার আইডি: \nকারণ: ",
+  support: "আসসালামু আলাইকুম, HULLOR সম্পর্কে আমার কিছু জিজ্ঞাসা আছে।",
+};
+
 /* =========================================================
    কার্ট পার্সিস্ট (localStorage) — পেজ পরিবর্তন করলেও কার্ট থেকে যাবে
    ========================================================= */
@@ -546,9 +554,11 @@ function showSuccess(orderId, payload) {
    ইনিট
    ========================================================= */
 function init() {
-  // whatsapp লিংক বসানো (যেখানেই data-wa-order আছে)
+  // whatsapp লিংক বসানো (যেখানেই data-wa-order আছে) — প্রতিটি বাটনের নিজস্ব উদ্দেশ্য অনুযায়ী আলাদা মেসেজ
   $$("[data-wa-order]").forEach((a) => {
-    a.href = waLink("আসসালামু আলাইকুম, আমি HULLOR থেকে একটি অর্ডার করতে চাই।");
+    const purpose = a.dataset.waOrder || "order";
+    const msg = WA_MESSAGES[purpose] || WA_MESSAGES.order;
+    a.href = waLink(msg);
   });
   const topbarPhone = $("#topbarPhone");
   if (topbarPhone) topbarPhone.textContent = STORE_PHONE_DISPLAY;
