@@ -61,7 +61,7 @@ function saveCart() {
    হিরো ইমেজ স্লাইডার (৩টি ছবি)
    ========================================================= */
 const HERO_SLIDES = [
-  { image: "/images/punjabi1-demo.jpg", title: "নতুন পাঞ্জাবি কালেকশন" },
+  { image: "/images/hero_slider_punjabi.jpg", title: "নতুন পাঞ্জাবি কালেকশন" },
   { image: "/images/shirt1-demo.jpg", title: "সিগনেচার শার্ট সিরিজ" },
   { image: "/images/dropshoulder1-demo.jpg", title: "ট্রেন্ডি ড্রপ শোল্ডার" },
 ];
