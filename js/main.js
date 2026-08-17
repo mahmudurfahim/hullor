@@ -62,8 +62,8 @@ function saveCart() {
    ========================================================= */
 const HERO_SLIDES = [
   { image: "/images/hero_slider_punjabi.jpg", title: "নতুন পাঞ্জাবি কালেকশন" },
-  { image: "/images/shirt1-demo.jpg", title: "সিগনেচার শার্ট সিরিজ" },
-  { image: "/images/dropshoulder1-demo.jpg", title: "ট্রেন্ডি ড্রপ শোল্ডার" },
+  { image: "/images/hero_slider_shirt.jpg", title: "সিগনেচার শার্ট সিরিজ" },
+  { image: "/images/hero_slider_dropshoulder.jpg", title: "ট্রেন্ডি ড্রপ শোল্ডার" },
 ];
 let heroSlideIndex = 0;
 let heroSlideTimer = null;
