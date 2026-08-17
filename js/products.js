@@ -406,12 +406,12 @@ const PRODUCTS = [
     desc: "আপনার প্রিয় মানুষকে দেওয়ার জন্য একটি স্টাইলিশ ও স্মরণীয় গিফট কম্বো। জন্মদিন, ভালোবাসার মানুষ, বন্ধু, ভাই কিংবা যেকোনো বিশেষ উপলক্ষের জন্য উপযুক্ত। কম্বোতে রয়েছে একটি স্টাইলিশ শার্ট, একটি প্রিমিয়াম ঘড়ি, একটি মানিব্যাগ, একটি বডি স্প্রে, একটি ট্রেন্ডি সানগ্লাস, একটি ফ্যাশনেবল বেল্ট এবং একটি গিফট চিরকুট।",
   },
 
-// ===================== পাঞ্জাবি (Popcorn Diamond Panjabi) =====================
+// ===================== পাঞ্জাবি (পপকর্ন ডায়মন্ড পাঞ্জাবি) =====================
   {
     featured: true,
     id: "punjabi-01",
     code: "POPPPNK",
-    name: "Popcorn Diamond Panjabi - ক্যামেল",
+    name: "পপকর্ন ডায়মন্ড পাঞ্জাবি - ক্যামেল",
     category: "punjabi",
     fabric: "হাই-গ্রেড কটন ফ্যাব্রিক",
     fit: "রেগুলার ফিট",
@@ -425,7 +425,7 @@ const PRODUCTS = [
   {
     id: "punjabi-02",
     code: "POPPMRN",
-    name: "Popcorn Diamond Panjabi - গাঢ় খয়েরি",
+    name: "পপকর্ন ডায়মন্ড পাঞ্জাবি - গাঢ় খয়েরি",
     category: "punjabi",
     fabric: "হাই-গ্রেড কটন ফ্যাব্রিক",
     fit: "রেগুলার ফিট",
@@ -440,7 +440,7 @@ const PRODUCTS = [
     featured: true,
     id: "punjabi-03",
     code: "POPPBK",
-    name: "Popcorn Diamond Panjabi - কালো",
+    name: "পপকর্ন ডায়মন্ড পাঞ্জাবি - কালো",
     category: "punjabi",
     fabric: "হাই-গ্রেড কটন ফ্যাব্রিক",
     fit: "রেগুলার ফিট",
@@ -454,7 +454,7 @@ const PRODUCTS = [
   {
     id: "punjabi-04",
     code: "POPPWH",
-    name: "Popcorn Diamond Panjabi - সাদা",
+    name: "পপকর্ন ডায়মন্ড পাঞ্জাবি - সাদা",
     category: "punjabi",
     fabric: "হাই-গ্রেড কটন ফ্যাব্রিক",
     fit: "রেগুলার ফিট",
@@ -468,7 +468,7 @@ const PRODUCTS = [
   {
     id: "punjabi-05",
     code: "POPPBL",
-    name: "Popcorn Diamond Panjabi - সিগ্রিন",
+    name: "পপকর্ন ডায়মন্ড পাঞ্জাবি - সিগ্রিন",
     category: "punjabi",
     fabric: "হাই-গ্রেড কটন ফ্যাব্রিক",
     fit: "রেগুলার ফিট",
