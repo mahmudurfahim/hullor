@@ -61,9 +61,9 @@ function saveCart() {
    হিরো ইমেজ স্লাইডার (৩টি ছবি)
    ========================================================= */
 const HERO_SLIDES = [
-  { image: "/images/hero_slider_punjabi.jpg", title: "নতুন পাঞ্জাবি কালেকশন" },
-  { image: "/images/hero_slider_shirt.jpg", title: "সিগনেচার শার্ট সিরিজ" },
-  { image: "/images/hero_slider_dropshoulder.jpg", title: "ট্রেন্ডি ড্রপ শোল্ডার" },
+  { image: "/images/hero_slider_punjabi.jpg", title: "নতুন পাঞ্জাবি কালেকশন", link: "/shop?category=punjabi" },
+  { image: "/images/hero_slider_shirt.jpg", title: "সিগনেচার শার্ট সিরিজ", link: "/shop?category=shirt" },
+  { image: "/images/hero_slider_dropshoulder.jpg", title: "ট্রেন্ডি ড্রপ শোল্ডার", link: "/shop?category=dropshoulder" },
 ];
 let heroSlideIndex = 0;
 let heroSlideTimer = null;
@@ -77,7 +77,8 @@ function initHeroSlider() {
   const titleEl = $("#heroSlideTitle");
 
   track.innerHTML = HERO_SLIDES.map(
-    (s, i) => `<div class="hero-slide" data-i="${i}"><img src="${s.image}" alt="${s.title}" onerror="this.src='/images/logo.jpg'"></div>`
+    (s, i) =>
+      `<a class="hero-slide" data-i="${i}" href="${s.link || "/shop"}"><img src="${s.image}" alt="${s.title}" draggable="false" onerror="this.src='/images/logo.jpg'"></a>`
   ).join("");
 
   dotsWrap.innerHTML = HERO_SLIDES.map(
@@ -85,12 +86,67 @@ function initHeroSlider() {
   ).join("");
 
   titleEl.textContent = HERO_SLIDES[0].title;
+  titleEl.href = HERO_SLIDES[0].link || "/shop";
 
   $$(".hero-dot", dotsWrap).forEach((dot) => {
     dot.addEventListener("click", () => goToHeroSlide(Number(dot.dataset.i)));
   });
 
+  wireHeroSwipe(track);
   startHeroAutoplay();
+}
+
+/* ম্যানুয়াল সোয়াইপ/ড্র্যাগ (টাচ ও মাউস দুটোতেই কাজ করে) —
+   ছোট নড়াচড়া = ট্যাপ (স্লাইডের লিংকে চলে যাবে), বড় নড়াচড়া = সোয়াইপ (স্লাইড বদলাবে, লিংকে যাবে না) */
+function wireHeroSwipe(track) {
+  const SWIPE_THRESHOLD = 45;
+  let startX = 0;
+  let currentX = 0;
+  let dragging = false;
+  let moved = false;
+
+  const onStart = (x) => {
+    dragging = true;
+    moved = false;
+    startX = x;
+    currentX = x;
+    clearInterval(heroSlideTimer);
+  };
+  const onMove = (x) => {
+    if (!dragging) return;
+    currentX = x;
+    if (Math.abs(currentX - startX) > 8) moved = true;
+  };
+  const onEnd = () => {
+    if (!dragging) return;
+    dragging = false;
+    const delta = currentX - startX;
+    if (delta > SWIPE_THRESHOLD) {
+      goToHeroSlide((heroSlideIndex - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    } else if (delta < -SWIPE_THRESHOLD) {
+      goToHeroSlide((heroSlideIndex + 1) % HERO_SLIDES.length);
+    } else {
+      startHeroAutoplay();
+    }
+  };
+
+  track.addEventListener("touchstart", (e) => onStart(e.touches[0].clientX), { passive: true });
+  track.addEventListener("touchmove", (e) => onMove(e.touches[0].clientX), { passive: true });
+  track.addEventListener("touchend", onEnd);
+
+  track.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    onStart(e.clientX);
+  });
+  window.addEventListener("mousemove", (e) => onMove(e.clientX));
+  window.addEventListener("mouseup", onEnd);
+
+  // সোয়াইপ হয়ে থাকলে (moved === true) স্লাইডের লিংকে ক্লিক-নেভিগেশন আটকে দেওয়া হচ্ছে
+  $$(".hero-slide", track).forEach((a) => {
+    a.addEventListener("click", (e) => {
+      if (moved) e.preventDefault();
+    });
+  });
 }
 
 function goToHeroSlide(i) {
@@ -98,7 +154,9 @@ function goToHeroSlide(i) {
   const track = $("#heroSlideTrack");
   track.style.transform = `translateX(-${i * 100}%)`;
   $$(".hero-dot").forEach((d) => d.classList.toggle("active", Number(d.dataset.i) === i));
-  $("#heroSlideTitle").textContent = HERO_SLIDES[i].title;
+  const titleEl = $("#heroSlideTitle");
+  titleEl.textContent = HERO_SLIDES[i].title;
+  titleEl.href = HERO_SLIDES[i].link || "/shop";
   restartHeroAutoplay();
 }
 
