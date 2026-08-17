@@ -23,7 +23,7 @@ const PRODUCTS = [
     featured: true,
     id: "shirt-01",
     code: "FMSHDAS",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -37,7 +37,7 @@ const PRODUCTS = [
   {
     id: "shirt-02",
     code: "FMSHRED",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -51,7 +51,7 @@ const PRODUCTS = [
   {
     id: "shirt-03",
     code: "FMSHBLU",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -66,7 +66,7 @@ const PRODUCTS = [
     featured: true,
     id: "shirt-04",
     code: "FMSHMRN",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -80,7 +80,7 @@ const PRODUCTS = [
   {
     id: "shirt-05",
     code: "FMSHWHT",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -94,7 +94,7 @@ const PRODUCTS = [
   {
     id: "shirt-06",
     code: "FMSHCYN",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -109,7 +109,7 @@ const PRODUCTS = [
     featured: true,
     id: "shirt-07",
     code: "FMSHASH",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -123,7 +123,7 @@ const PRODUCTS = [
   {
     id: "shirt-08",
     code: "FMSHPNK",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -137,7 +137,7 @@ const PRODUCTS = [
   {
     id: "shirt-09",
     code: "FMSHSBL",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -152,7 +152,7 @@ const PRODUCTS = [
     featured: true,
     id: "shirt-10",
     code: "FMSHBLK",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -166,7 +166,7 @@ const PRODUCTS = [
   {
     id: "shirt-11",
     code: "FMSHGRN",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -180,7 +180,7 @@ const PRODUCTS = [
   {
     id: "shirt-12",
     code: "FMSHORG",
-    name: "Premium Men's Long Sleeve Formal Cotton Shirt",
+    name: "প্রিমিয়াম মেন্স লং স্লিভ ফরমাল কটন শার্ট",
     category: "shirt",
     fabric: "প্রিমিয়াম কটন ফেব্রিক",
     fit: "রেগুলার ফিট",
@@ -192,16 +192,16 @@ const PRODUCTS = [
     desc: "প্রিমিয়াম কটন ফেব্রিকে তৈরি ফুল স্লিভ ফরমাল শার্ট। অফিস, মিটিং, পার্টি ও দৈনন্দিন ব্যবহারের জন্য আদর্শ।",
   },
 
-  // ===================== পোলো টি-শার্ট (ডেমো — আসল পণ্য বসান) =====================
+  // ===================== পোলো টি-শার্ট =====================
   { featured: true, id: "polo-01", code: "HL-POLO-01", name: "প্রিমিয়াম পিকে পোলো", category: "polo", fabric: "কটন পিকে ফেব্রিক", fit: "স্লিম ফিট", care: "মেশিন ওয়াশ, ব্লিচ পরিহার করুন", price: 650, oldPrice: 800, image: "/images/polo1-demo.jpg", sizes: ["S", "M", "L", "XL"], desc: "১০০% কটন পিকে ফেব্রিক, স্মার্ট-ক্যাজুয়াল লুকের জন্য সেরা পছন্দ।" },
   { id: "polo-02", code: "HL-POLO-02", name: "স্লিম ফিট পোলো", category: "polo", fabric: "কটন পিকে ফেব্রিক", fit: "স্লিম ফিট", care: "মেশিন ওয়াশ, ব্লিচ পরিহার করুন", price: 700, oldPrice: null, image: "/images/polo2-demo.jpg", sizes: ["M", "L", "XL"], desc: "স্লিম ফিট কাটিং, দৈনন্দিন স্টাইলিশ লুকের জন্য।" },
   { id: "polo-03", code: "HL-POLO-03", name: "স্ট্রাইপড পোলো", category: "polo", fabric: "কটন পিকে ফেব্রিক", fit: "স্লিম ফিট", care: "মেশিন ওয়াশ, ব্লিচ পরিহার করুন", price: 680, oldPrice: 820, image: "/images/polo3-demo.jpg", sizes: ["S", "M", "L", "XL", "XXL"], desc: "ক্লাসিক স্ট্রাইপ ডিজাইনের নরম কটন পোলো টি-শার্ট।" },
 
-  // ===================== ড্রপ শোল্ডার (ডেমো — আসল পণ্য বসান) =====================
+  // ===================== ড্রপ শোল্ডার =====================
   { featured: true, id: "ds-01", code: "HL-DS-01", name: "ওভারসাইজড ড্রপ শোল্ডার", category: "dropshoulder", fabric: "হেভি কটন জার্সি নিট", fit: "ওভারসাইজড / রিল্যাক্সড ফিট", care: "ঠান্ডা পানিতে ধোয়া, উল্টে শুকান", price: 750, oldPrice: 900, image: "/images/dropshoulder1-demo.jpg", sizes: ["M", "L", "XL"], desc: "ট্রেন্ডি ওভারসাইজড ফিট, স্ট্রিটওয়্যার লুকের জন্য পারফেক্ট।" },
   { id: "ds-02", code: "HL-DS-02", name: "মিনিমাল ড্রপ শোল্ডার টি", category: "dropshoulder", fabric: "হেভি কটন জার্সি নিট", fit: "ওভারসাইজড / রিল্যাক্সড ফিট", care: "ঠান্ডা পানিতে ধোয়া, উল্টে শুকান", price: 720, oldPrice: null, image: "/images/dropshoulder2-demo.jpg", sizes: ["S", "M", "L", "XL"], desc: "সাদামাটা ডিজাইন, প্রতিদিনের আরামদায়ক পরিধানের জন্য।" },
 
-  // ===================== প্যান্ট (ডেমো — আসল পণ্য বসান) =====================
+  // ===================== প্যান্ট =====================
   { featured: true, id: "pants-01", code: "HL-PANT-01", name: "স্লিম ফিট গ্যাবার্ডিন প্যান্ট", category: "pants", fabric: "গ্যাবার্ডিন / টুইল কটন", fit: "স্লিম-স্ট্রেইট ফিট", care: "ড্রাই ওয়াশ প্রাধান্য দিন", price: 950, oldPrice: 1150, image: "/images/pants1-demo.jpg", sizes: ["30", "32", "34", "36"], desc: "উন্নতমানের গ্যাবার্ডিন কাপড়ে তৈরি, অফিস ও ক্যাজুয়াল উভয় ব্যবহারের উপযোগী।" },
   { id: "pants-02", code: "HL-PANT-02", name: "কার্গো প্যান্ট", category: "pants", fabric: "গ্যাবার্ডিন / টুইল কটন", fit: "স্লিম-স্ট্রেইট ফিট", care: "ড্রাই ওয়াশ প্রাধান্য দিন", price: 1050, oldPrice: null, image: "/images/pants2-demo.jpg", sizes: ["30", "32", "34", "36", "38"], desc: "মাল্টিপল পকেট সহ টেকসই কার্গো প্যান্ট।" },
 
