@@ -107,6 +107,26 @@ function restartHeroAutoplay() {
 /* =========================================================
    ক্যাটাগরি ট্যাব রেন্ডার (শুধু শপ পেজে)
    ========================================================= */
+/* =========================================================
+   ক্যাটাগরি URL সিঙ্ক — /shop?category=shirt এর মতো লিংক শেয়ারযোগ্য করার জন্য
+   ========================================================= */
+function getCategoryFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const cat = params.get("category");
+  if (cat && CATEGORIES.some((c) => c.id === cat)) return cat;
+  return "all";
+}
+
+function setCategoryInURL(cat) {
+  const url = new URL(window.location.href);
+  if (cat === "all") {
+    url.searchParams.delete("category");
+  } else {
+    url.searchParams.set("category", cat);
+  }
+  window.history.replaceState({}, "", url.pathname + url.search);
+}
+
 function renderCategoryTabs() {
   const wrap = $("#catTabs");
   if (!wrap) return;
@@ -116,6 +136,7 @@ function renderCategoryTabs() {
   $$(".cat-tab", wrap).forEach((btn) => {
     btn.addEventListener("click", () => {
       activeCategory = btn.dataset.cat;
+      setCategoryInURL(activeCategory);
       renderCategoryTabs();
       renderProducts();
     });
@@ -533,6 +554,8 @@ function init() {
   if (topbarPhone) topbarPhone.textContent = STORE_PHONE_DISPLAY;
   const topbarPhone2 = $("#topbarPhone2");
   if (topbarPhone2) topbarPhone2.textContent = STORE_PHONE_DISPLAY;
+
+  activeCategory = getCategoryFromURL();
 
   initHeroSlider();
   renderCategoryTabs();
