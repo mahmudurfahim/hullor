@@ -218,7 +218,6 @@ function productCardHTML(p) {
   const discount = p.oldPrice ? Math.round(100 - (p.price / p.oldPrice) * 100) : null;
   return `
     <div class="p-card" data-id="${p.id}">
-      <span class="punch"></span>
       <div class="p-media" data-role="view" style="cursor:pointer;">
         <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='/images/logo.jpg'">
         ${discount ? `<span class="p-badge">${bnDigits(discount)}% ছাড়</span>` : ""}
@@ -263,6 +262,69 @@ function wireProductCard(card) {
   $('[data-role="add"]', card).addEventListener("click", () => addToCart(id));
   $$('[data-role="view"]', card).forEach((el) => el.addEventListener("click", () => openProductModal(id)));
 }
+
+/* =========================================================
+   ওভারলে ম্যানেজার — বডি স্ক্রল লক + মোবাইল ব্যাক বাটনে শুধু ডায়ালগ বন্ধ হবে,
+   পেজ থেকে বের হয়ে যাবে না
+   ========================================================= */
+let historyPushedForOverlay = false;
+let overlayReleaseTimer = null;
+
+function anyOverlayOpen() {
+  return (
+    $("#cartDrawer")?.classList.contains("open") ||
+    $("#checkoutModal")?.classList.contains("open") ||
+    $("#productModal")?.classList.contains("open")
+  );
+}
+
+function syncOverlayState() {
+  const isOpen = anyOverlayOpen();
+  document.body.classList.toggle("scroll-lock", isOpen);
+
+  if (isOpen) {
+    if (overlayReleaseTimer) {
+      clearTimeout(overlayReleaseTimer);
+      overlayReleaseTimer = null;
+    }
+    if (!historyPushedForOverlay) {
+      history.pushState({ hullorOverlay: true }, "");
+      historyPushedForOverlay = true;
+    }
+  } else {
+    // সাথে সাথে হিস্ট্রি স্টেট সরানো হচ্ছে না — যদি একই মুহূর্তে অন্য একটা ওভারলে খোলে
+    // (যেমন প্রোডাক্ট মোডাল থেকে কার্ট ড্রয়ারে ট্রানজিশন), তাহলে এই রিলিজ বাতিল হয়ে যাবে
+    overlayReleaseTimer = setTimeout(() => {
+      overlayReleaseTimer = null;
+      if (historyPushedForOverlay) {
+        historyPushedForOverlay = false;
+        if (history.state && history.state.hullorOverlay) {
+          history.back();
+        }
+      }
+    }, 0);
+  }
+}
+
+function closeAllOverlaysSilently() {
+  $("#cartDrawer")?.classList.remove("open");
+  $("#checkoutModal")?.classList.remove("open");
+  $("#productModal")?.classList.remove("open");
+  $("#overlay")?.classList.remove("open");
+  document.body.classList.remove("scroll-lock");
+}
+
+window.addEventListener("popstate", () => {
+  // ব্যাক বাটনে চাপলে খোলা ড্রয়ার/মোডাল বন্ধ হয়ে যাবে, পেজ থেকে বের হবে না
+  if (historyPushedForOverlay) {
+    historyPushedForOverlay = false;
+    if (overlayReleaseTimer) {
+      clearTimeout(overlayReleaseTimer);
+      overlayReleaseTimer = null;
+    }
+    closeAllOverlaysSilently();
+  }
+});
 
 /* =========================================================
    প্রোডাক্ট ডিটেইলস (কুইক-ভিউ) মোডাল — প্রতিটি পণ্যের নিজস্ব বিস্তারিত তথ্য
@@ -319,11 +381,13 @@ function openProductModal(productId) {
   modal.classList.add("open");
   $("#overlay")?.classList.add("open");
   $("#cartDrawer")?.classList.remove("open");
+  syncOverlayState();
 }
 
 function closeProductModal() {
   $("#productModal")?.classList.remove("open");
   $("#overlay")?.classList.remove("open");
+  syncOverlayState();
 }
 
 /* =========================================================
@@ -377,7 +441,6 @@ function addToCart(productId) {
   saveCart();
   renderCart();
   updateCartCount();
-  showToast(`"${product.name}" (সাইজ: ${size}) কার্টে যোগ হয়েছে`);
   openCart();
   return true;
 }
@@ -476,10 +539,12 @@ function openCart() {
   closeProductModal();
   $("#overlay")?.classList.add("open");
   $("#cartDrawer")?.classList.add("open");
+  syncOverlayState();
 }
 function closeCart() {
   $("#overlay")?.classList.remove("open");
   $("#cartDrawer")?.classList.remove("open");
+  syncOverlayState();
 }
 
 function openCheckout() {
@@ -491,10 +556,12 @@ function openCheckout() {
   renderOrderSummary();
   $("#checkoutModal")?.classList.add("open");
   $("#overlay")?.classList.add("open");
+  syncOverlayState();
 }
 function closeCheckout() {
   $("#checkoutModal")?.classList.remove("open");
   $("#overlay")?.classList.remove("open");
+  syncOverlayState();
 }
 
 function renderOrderSummary() {
