@@ -2,20 +2,35 @@
    HULLOR — ডিজাইন টোকেন
    ========================================================= */
 :root {
-  --bg: #101210;
-  --bg-soft: #171a16;
-  --panel: #182119;
-  --panel-2: #1c261e;
-  --green: #1f4a37;
-  --green-deep: #12261c;
-  --green-light: #2e6b4d;
-  --gold: #c8a24a;
-  --gold-light: #e6c978;
-  --gold-dim: #8a713a;
-  --cream: #f4efe1;
-  --muted: #a9b3a7;
-  --line: rgba(200, 162, 74, 0.22);
-  --danger: #c9634a;
+:root {
+  /* Backgrounds */
+  --bg: #F7F5EF;           /* warm off-white */
+  --bg-soft: #EFEEE8;      /* soft ash */
+  
+  /* Cards / Panels */
+  --panel: #FFFDF8;        /* warm white */
+  --panel-2: #F3F1E9;      /* light cream */
+
+  /* Green */
+  --green: #2F6048;        /* primary green */
+  --green-deep: #234735;   /* headings / strong green */
+  --green-light: #5F896F;  /* lighter accent */
+
+  /* Gold */
+  --gold: #B18A32;         /* primary gold */
+  --gold-light: #D8BD70;   /* soft gold */
+  --gold-dim: #9B8248;     /* muted gold */
+
+  /* Text */
+  --cream: #2B302B;        /* primary text */
+  --muted: #737A72;        /* secondary text */
+
+  /* Borders */
+  --line: rgba(47, 96, 72, 0.14);
+
+  /* Status */
+  --danger: #B95743;
+}
 
   --font-display: "Baloo Da 2", "Hind Siliguri", sans-serif;
   --font-body: "Hind Siliguri", "Noto Sans Bengali", sans-serif;
