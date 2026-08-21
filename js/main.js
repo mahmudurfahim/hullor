@@ -30,6 +30,21 @@ function waLink(text) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
+/* =========================================================
+   Meta Pixel — কাস্টম ইভেন্ট হেল্পার
+   fbq() সবসময় উপলব্ধ কিনা যাচাই করে নিরাপদে কল করা হয়
+   (adblocker বা স্ক্রিপ্ট ব্লক থাকলেও যেন সাইট ক্র্যাশ না করে)
+   ========================================================= */
+function trackPixelEvent(eventName, params) {
+  try {
+    if (typeof fbq === "function") {
+      fbq("track", eventName, params || {});
+    }
+  } catch (e) {
+    /* pixel ব্লকড থাকলেও সাইটের কার্যক্রম স্বাভাবিক থাকবে */
+  }
+}
+
 // প্রতিটি হোয়াটসঅ্যাপ বাটনের নিজস্ব উদ্দেশ্য অনুযায়ী আলাদা বার্তা
 const WA_MESSAGES = {
   order: "আসসালামু আলাইকুম, আমি HULLOR থেকে একটি অর্ডার করতে চাই।",
@@ -170,9 +185,6 @@ function restartHeroAutoplay() {
   startHeroAutoplay();
 }
 
-/* =========================================================
-   ক্যাটাগরি ট্যাব রেন্ডার (শুধু শপ পেজে)
-   ========================================================= */
 /* =========================================================
    ক্যাটাগরি URL সিঙ্ক — /shop?category=shirt এর মতো লিংক শেয়ারযোগ্য করার জন্য
    ========================================================= */
@@ -442,6 +454,17 @@ function addToCart(productId) {
   renderCart();
   updateCartCount();
   openCart();
+
+  // ----- Meta Pixel: AddToCart -----
+  trackPixelEvent("AddToCart", {
+    content_ids: [product.id],
+    content_name: product.name,
+    content_type: "product",
+    contents: [{ id: product.id, quantity: 1, item_price: product.price }],
+    value: product.price,
+    currency: "BDT",
+  });
+
   return true;
 }
 
@@ -557,6 +580,15 @@ function openCheckout() {
   $("#checkoutModal")?.classList.add("open");
   $("#overlay")?.classList.add("open");
   syncOverlayState();
+
+  // ----- Meta Pixel: InitiateCheckout -----
+  trackPixelEvent("InitiateCheckout", {
+    content_ids: cart.map((i) => i.id),
+    contents: cart.map((i) => ({ id: i.id, quantity: i.qty, item_price: i.price })),
+    num_items: cartCount(),
+    value: cartTotal(),
+    currency: "BDT",
+  });
 }
 function closeCheckout() {
   $("#checkoutModal")?.classList.remove("open");
@@ -646,6 +678,19 @@ function submitOrder(e) {
   } else {
     console.warn("APPS_SCRIPT_URL সেট করা হয়নি — js/main.js ফাইলে URL বসান। README.md দেখুন।");
   }
+
+  // ----- Meta Pixel: Purchase -----
+  // অর্ডারটি ক্যাশ অন ডেলিভারি হলেও গ্রাহক অর্ডার কনফার্ম করেছেন,
+  // তাই এটাকে Purchase ইভেন্ট হিসেবে ট্র্যাক করা হচ্ছে (order-confirmed = conversion)
+  trackPixelEvent("Purchase", {
+    content_ids: cart.map((i) => i.id),
+    content_type: "product",
+    contents: cart.map((i) => ({ id: i.id, quantity: i.qty, item_price: i.price })),
+    num_items: cart.reduce((sum, i) => sum + i.qty, 0),
+    value: cartTotal(),
+    currency: "BDT",
+    order_id: orderId,
+  });
 
   showSuccess(orderId, payload);
   cart = [];
